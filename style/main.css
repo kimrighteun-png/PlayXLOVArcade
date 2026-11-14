@@ -122,9 +122,10 @@ body {
 }
 
 .start-btn {
+    position: absolute;
     padding: 0;
     cursor: pointer;
-    margin-top: 23%;
+    margin-top: 14%;
 }
 
 .start-btn{
@@ -217,11 +218,12 @@ body {
 
 
 .menu-characters {
+    position: absolute;
     display: flex;
     align-items: flex-end;
     justify-content: center;
     gap: 15px;
-    margin-bottom: 17%;
+    top: 47%;
 }
 
 
