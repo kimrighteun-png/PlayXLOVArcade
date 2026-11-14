@@ -52,7 +52,13 @@
         <div class="top-bar">
             <div id="mini-leaderboard">TOP 1: 0</div>
             <div id="score-display">SCORE: 0</div>
-            <div id="hearts-display">❤️❤️❤️❤️❤️</div>
+            <div id="hearts-display">
+    <img src="media/live.png" class="heart-icon">
+    <img src="media/live.png" class="heart-icon">
+    <img src="media/live.png" class="heart-icon">
+    <img src="media/live.png" class="heart-icon">
+    <img src="media/live.png" class="heart-icon">
+</div>
             
             <button id="back" class="back-btn">
         <img id="back-icon" src="media/back.png">
@@ -65,11 +71,17 @@
         <!-- Пиксельный геймпад -->
         <div class="gamepad">
             <div class="d-pad">
-                <button id="btn-up" class="pad-btn">▲</button>
-                <button id="btn-down" class="pad-btn">▼</button>
+                <button id="btn-up" class="pad-btn"><img src="media/up.png"></button>
+                <button id="btn-down" class="pad-btn"><img src="media/down.png"></button>
             </div>
             <button id="btn-attack" class="pad-btn attack-btn">FIRE</button>
         </div>
+        <!-- Окно проигрыша -->
+<div id="game-over-modal" class="game-over-modal" style="display: none;">
+    <h2>GAME OVER</h2>
+    <p id="final-score">SCORE: 0</p>
+    <button id="btn-restart" class="restart-btn">PLAY AGAIN</button>
+</div>
     </div>
 
 
