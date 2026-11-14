@@ -41,8 +41,8 @@ html, body {
 
 .sound-btn {
     position: fixed;
-    top: 2vh;
-    right: 2vh;
+    top: 2%;
+    right: 2%;
     background: transparent;
     border: none;
     padding: 0;
@@ -52,8 +52,8 @@ html, body {
 
 .back-btn {
     position: fixed;
-    top: 10vh;
-    right: 2vh;
+    top: 10%;
+    right: 2%;
     background: transparent;
     border: none;
     padding: 0;
@@ -116,7 +116,7 @@ body {
 
 
 .menu-title {
-    margin-bottom: -15vh;
+    margin-bottom: -22%;
     height: 10vh;
     width: auto;
 }
@@ -124,7 +124,7 @@ body {
 .start-btn {
     padding: 0;
     cursor: pointer;
-    margin-top: 15vh;
+    margin-top: 23%;
 }
 
 .start-btn{
@@ -156,8 +156,8 @@ body {
     border: none;
     height: 5vh;
     width: auto;
-    top: 45vh;
-    right: -20vw;
+    top: 45%;
+    right: -20%;
 }
 
 .btn-next img {
@@ -173,8 +173,8 @@ body {
     border: none;
     height: 5vh;
     width: auto;
-    top: 45vh;
-    left: -20vw;
+    top: 45%;
+    left: -20%;
 }
 
 .btn-prev img {
@@ -221,7 +221,7 @@ body {
     align-items: flex-end;
     justify-content: center;
     gap: 15px;
-    margin-bottom: 22vh;
+    margin-bottom: 17%;
 }
 
 
@@ -236,22 +236,22 @@ body {
     height: 40vh;
     width: auto;
     image-rendering: pixelated;
-    margin-top: 30vh;
-    margin-left: -15vw;
+    margin-top: 30%;
+    margin-left: -40%;
 }
 
 .char-name{
     position: absolute;
     font-size: 6vh;
-    top: 42vh;
-    left: 25vw;
+    top: 42%;
+    left: 45%;
 }
 
 .char-desc{
     position: absolute;
     font-size: 2.8vh;
-    top: 52vh;
-    left: 25vw;
+    top: 52%;
+    left: 45%;
     text-align: left;
     line-height: 1,4;
     width: 15vw;
@@ -261,7 +261,7 @@ body {
     position:absolute;
     background: none;
     border: none;
-    bottom: 5vh;
+    bottom: 5%;
 }
 
 .btn-start-game img {
