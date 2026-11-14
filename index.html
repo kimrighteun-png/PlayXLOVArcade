@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Play XLOV Arcade</title>
+
+    <link rel="stylesheet" href="style/main.css">
+
+</head>
+<body>
+
+    <button id="sound" class="sound-btn">
+        <img id="sound-icon" src="media/music-on.png">
+    </button>
+
+    <audio id="bgmMenu" src="music/chiwawa.ogg" loop ></audio>
+    <audio id="bgmGame" src="music/biiip.ogg" loop ></audio>
+    
+<div id="main-menu" class="screen active">
+
+        <div><img src="media/title.png" class="menu-title"></div>
+
+        <button id="start-btn" class="start-btn"> <img src="media/start-btn.png"> </button>
+        
+        <div class="menu-characters">
+            <img src="media/Wumuti.png" class="chibi-sprite">
+            <img src="media/Rui.png" class="chibi-sprite">
+            <img src="media/Hyun.png" class="chibi-sprite">
+            <img src="media/Haru.png" class="chibi-sprite">
+        </div>
+    </div>
+
+
+<div id="character-select" class="screen">
+        <button id="btn-prev" class="btn-prev"><img src="media/prev.png"></button>
+        <button id="btn-next" class="btn-next"><img src="media/next.png"></button>
+
+        <img id="char-preview" src="media/Wumuti.png" class="chibi-preview">
+        <h2 id="char-name" class="char-name">WUMUTI</h2>
+        <p id="char-desc" class="char-desc">Тёмный клинок. Мощный ближний бой с двойными очками.</p>
+
+        <button id="btn-start-game" class="btn-start-game"><img src="media/start-game-btn.png">></button>
+    </div>
+
+
+        <div id="screen-game" class="screen">
+        <div class="top-bar">
+            <div id="mini-leaderboard">TOP 1: 0</div>
+            <div id="score-display">SCORE: 0</div>
+            <div id="hearts-display">❤️❤️❤️❤️❤️</div>
+            
+            <button id="back" class="back-btn">
+        <img id="back-icon" src="media/back.png">
+    </button>
+        </div>
+
+        <!-- Игровое поле с 4 дорожками -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Пиксельный геймпад -->
+        <div class="gamepad">
+            <div class="d-pad">
+                <button id="btn-up" class="pad-btn">▲</button>
+                <button id="btn-down" class="pad-btn">▼</button>
+            </div>
+            <button id="btn-attack" class="pad-btn attack-btn">FIRE</button>
+        </div>
+    </div>
+
+
+    <script src="script/script.js"></script>
+
+
+</body>
+</html>
