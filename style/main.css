@@ -209,14 +209,14 @@ body {
     position: absolute;
     font-size: 6vh;
     top: 42vh;
-    left: 12vw;
+    left: 25vw;
 }
 
 .char-desc{
     position: absolute;
     font-size: 2.8vh;
     top: 52vh;
-    left: 12vw;
+    left: 25vw;
     text-align: left;
     line-height: 1,4;
     width: 15vw;
