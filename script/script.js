@@ -94,6 +94,10 @@ document.addEventListener('click', () => {
     if (!isMuted && bgmMenu.paused && bgmGame.paused) {
         bgmMenu.play();
     }
+    const elem = document.documentElement;
+    if (!document.fullscreenElement && elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
+    }
 }, { once: true });
 
 // Кнопка с нотой включает и выключает звук

@@ -4,6 +4,32 @@
     -webkit-user-select: none;
 }
 
+/* По умолчанию скрываем надпись */
+.rotate-warning {
+    display: none;
+}
+
+/* Если экран вертикальный (портретный) — показываем заглушку поверх всего */
+@media screen and (orientation: portrait) {
+    .rotate-warning {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #1a0b2e;
+        color: #ff99cc;
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 4vw;
+        font-weight: bold;
+        padding: 20px;
+    }
+}
+
 .sound-btn {
     position: fixed;
     top: 2vh;
