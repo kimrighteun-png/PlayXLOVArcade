@@ -322,7 +322,7 @@ body {
     position: absolute;
     top: 6%;
     right: 7%;
-    font-size: 3vh;
+    font-size: 5%;
     z-index: 10;
 }
 
@@ -418,4 +418,10 @@ body {
     color: #ffffff;
     border: 3px solid #000000;
     cursor: pointer;
+}
+
+
+#btn-up, #btn-down, #btn-attack {
+    touch-action: none;
+    user-select: none;
 }

@@ -7,25 +7,25 @@ const CHARACTERS = [
     {
         id: 'wumuti',
         name: 'WUMUTI',
-        desc: 'Тёмный клинок. Мощный ближний бой с двойными очками.',
+        desc: 'Swings his sword in close range to instantly defeat enemies in front of him, dealing a lethal 3 HP one-shot blow.',
         img: 'media/Wumuti.png'
     },
     {
         id: 'rui',
         name: 'RUI',
-        desc: 'Розовый пикми-огнестрел. Быстрые прямые выстрелы.',
+        desc: 'Fires rapid star shots straight down his lane, dealing 1 HP of damage per hit and taking three shots to defeat an enemy.',
         img: 'media/Rui.png'
     },
     {
         id: 'hyun',
         name: 'HYUN',
-        desc: 'Крио-жезл. Выпускает разряд, замедляющий врагов.',
+        desc: 'Strikes enemies in close range with his bat for 1.5 HP of damage while knocking them back toward the right edge of the screen.',
         img: 'media/Hyun.png'
     },
     {
         id: 'haru',
         name: 'HARU',
-        desc: 'Лук. Удерживай кнопку атаки для мощного выстрела.',
+        desc: 'Fires quick arrows for 0.5 HP on a tap, or holds FIRE to charge a powerful shot dealing from 1 to 3 HP depending on the draw.',
         img: 'media/Haru.png'
     }
 ];
@@ -172,6 +172,15 @@ let score = 0;
 let enemies = [];
 let swingTimer = 0; // Таймер анимации удара мечом
 
+let bullets = [];
+const ruiBulletImg = new Image();
+ruiBulletImg.src = 'media/star.png';
+
+let arrows = [];
+let haruChargeStart = 0;
+const haruArrowImg = new Image();
+haruArrowImg.src = 'media/arrow.png';
+
 // Функция атаки (сработает при нажатии на FIRE или Пробел)
 function triggerAttack() {
     if (!gameRunning) return;
@@ -196,6 +205,38 @@ function triggerAttack() {
                     document.getElementById('score-display').textContent = 'SCORE: ' + score;
                 }
                 break; // За один взмах срубаем одного врага
+            }
+        }
+    }
+    // Атака Руи (выпуск звёздочки по прямой на 1 урон)
+    if (selectedChar.id.toLowerCase() === 'rui') {
+        bullets.push({
+            lane: currentLane,
+            x: canvas.width * 0.28,
+            speed: canvas.width * 0.014
+        });
+    }
+    // Атака Хёна (удар битой на 1.5 HP + отбрасывание врага назад)
+    if (selectedChar.id.toLowerCase() === 'hyun') {
+        swingTimer = 12; // Запускаем взмах битой на 105 градусов
+
+        const hitStartX = canvas.width * 0.19;
+        const hitEndX = canvas.width * 0.38;
+
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const enemy = enemies[i];
+            if (enemy.lane === currentLane && enemy.x >= hitStartX && enemy.x <= hitEndX) {
+                enemy.hp -= 1.5; // Сносим половину HP (2 удара на врага)
+
+                if (enemy.hp <= 0) {
+                    enemies.splice(i, 1);
+                    score += 1;
+                    document.getElementById('score-display').textContent = 'SCORE: ' + score;
+                } else {
+                    // Отбрасываем врага обратно вправо на 25% экрана!
+                    enemy.x += canvas.width * 0.25;
+                }
+                break;
             }
         }
     }
@@ -244,19 +285,80 @@ function moveDown() {
     if (gameRunning && currentLane < LANES - 1) currentLane++;
 }
 
-document.getElementById('btn-up').addEventListener('click', moveUp);
-document.getElementById('btn-down').addEventListener('click', moveDown);
-document.getElementById('btn-attack').addEventListener('click', triggerAttack);
+// Мгновенный мультитач для телефона (срабатывает при касании, не дожидаясь отпускания)
+document.getElementById('btn-up').addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    moveUp();
+});
 
-document.addEventListener('keydown', (e) => {
-    if (!gameRunning) return;
-    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') moveUp();
-    if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') moveDown();
-    if (e.code === 'Space') {
-        e.preventDefault();
+document.getElementById('btn-down').addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    moveDown();
+});
+
+document.getElementById('btn-attack').addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (CHARACTERS[currentCharIndex].id.toLowerCase() === 'haru') {
+        if (gameRunning && haruChargeStart === 0) haruChargeStart = performance.now();
+    } else {
         triggerAttack();
     }
 });
+
+document.getElementById('btn-attack').addEventListener('pointerup', (e) => {
+    e.preventDefault();
+    if (CHARACTERS[currentCharIndex].id.toLowerCase() === 'haru') {
+        releaseHaruArrow();
+    }
+});
+
+
+// Одновременная работа клавиш на клавиатуре ноутбука
+document.addEventListener('keydown', (e) => {
+    if (!gameRunning || e.repeat) return; // e.repeat запрещает зажатие, оставляя чистые нажатия
+
+    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === 'ц' || e.key === 'Ц') {
+        e.preventDefault();
+        moveUp();
+    }
+    if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S' || e.key === 'ы' || e.key === 'Ы') {
+        e.preventDefault();
+        moveDown();
+    }
+       if (e.code === 'Space') {
+        e.preventDefault();
+        if (CHARACTERS[currentCharIndex].id.toLowerCase() === 'haru') {
+            if (haruChargeStart === 0) haruChargeStart = performance.now();
+        } else {
+            triggerAttack();
+        }
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.code === 'Space' && CHARACTERS[currentCharIndex].id.toLowerCase() === 'haru') {
+        releaseHaruArrow();
+    }
+});
+
+function releaseHaruArrow() {
+    if (!gameRunning || haruChargeStart === 0) return;
+    const holdSeconds = (performance.now() - haruChargeStart) / 1000;
+    haruChargeStart = 0;
+
+    let dmg = 0.5;
+    if (holdSeconds >= 1.0) dmg = 3;
+    else if (holdSeconds >= 0.66) dmg = 2;
+    else if (holdSeconds >= 0.33) dmg = 1;
+
+    arrows.push({
+        lane: currentLane,
+        x: canvas.width * 0.26,
+        speed: canvas.width * 0.015,
+        damage: dmg
+    });
+}
+
 
 // Обновляем отображение 5 сердечек наверху
 function updateHeartsUI() {
@@ -268,11 +370,15 @@ function updateHeartsUI() {
 
 // Сброс и старт новой игры
 function startNewGame() {
+    if (document.activeElement) document.activeElement.blur();
     resizeCanvas();
     currentLane = 3;
     lives = 5;
     score = 0;
     enemies = [];
+    bullets = [];
+    arrows = [];
+    haruChargeStart = 0;
     spawnTimer = 0;
     updateHeartsUI();
     document.getElementById('score-display').textContent = 'SCORE: 0';
@@ -304,11 +410,12 @@ function gameLoop() {
 
         ctx.drawImage(sprite, playerX, playerY, charWidth, charHeight);
         const weaponImg = weaponSprites[selectedChar.id.toLowerCase()];
-        const weaponHeight = canvas.height * 0.14;
+        const isRui = selectedChar.id.toLowerCase() === 'rui';
+        const weaponHeight = isRui ? canvas.height * 0.08 : canvas.height * 0.14;
         const weaponX = playerX + charWidth + (canvas.width * 0.01);
         const weaponY = laneCenterY - weaponHeight / 2;
 
-        if (weaponImg && weaponImg.complete) {
+        if (weaponImg && weaponImg.complete && weaponImg.naturalWidth > 0) {
             const wAspect = weaponImg.naturalWidth / weaponImg.naturalHeight || 0.6;
             const weaponWidth = weaponHeight * wAspect;
 
@@ -324,6 +431,22 @@ function gameLoop() {
 
             ctx.drawImage(weaponImg, -weaponWidth / 2, -weaponHeight * 0.85, weaponWidth, weaponHeight);
             ctx.restore();
+                        // Цветная шкала натяжения лука Хару при удержании
+            if (selectedChar.id.toLowerCase() === 'haru' && haruChargeStart > 0) {
+                const holdSec = Math.min((performance.now() - haruChargeStart) / 1000, 1.0);
+                const barW = weaponHeight * 0.8;
+                const barH = 6;
+                const barX = weaponX;
+                const barY = weaponY - 10;
+
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(barX, barY, barW, barH);
+
+                // Голубой (1 HP) -> Жёлтый (2 HP) -> Зелёный (3 HP / ваншот!)
+                ctx.fillStyle = holdSec >= 1.0 ? '#4ade80' : (holdSec >= 0.66 ? '#facc15' : '#38bdf8');
+                ctx.fillRect(barX, barY, barW * holdSec, barH);
+            }
+
         }
 }
     
@@ -380,6 +503,75 @@ function gameLoop() {
                 document.getElementById('final-score').textContent = 'SCORE: ' + score;
                 document.getElementById('game-over-modal').style.display = 'block';
                 return;
+            }
+        }
+    }
+    // 4. Двигаем звёздочки-патроны Руи и проверяем попадания
+    const bulletSize = canvas.height * 0.05;
+
+    for (let b = bullets.length - 1; b >= 0; b--) {
+        const bullet = bullets[b];
+        bullet.x += bullet.speed;
+
+        const laneCenterY = topLimit + laneHeight * (bullet.lane + 0.5);
+        const bulletY = laneCenterY - bulletSize / 2;
+
+        if (ruiBulletImg.complete && ruiBulletImg.naturalWidth > 0) {
+            ctx.drawImage(ruiBulletImg, bullet.x, bulletY, bulletSize, bulletSize);
+        }
+
+        if (bullet.x > canvas.width + 50) {
+            bullets.splice(b, 1);
+            continue;
+        }
+
+        for (let e = enemies.length - 1; e >= 0; e--) {
+            const enemy = enemies[e];
+            if (enemy.lane === bullet.lane && bullet.x + bulletSize >= enemy.x && bullet.x <= enemy.x + enemySize) {
+                bullets.splice(b, 1);
+                enemy.hp -= 1;
+
+                if (enemy.hp <= 0) {
+                    enemies.splice(e, 1);
+                    score += 1;
+                    document.getElementById('score-display').textContent = 'SCORE: ' + score;
+                }
+                break;
+            }
+        }
+    }
+    // 5. Двигаем стрелы Хару и проверяем попадания
+    const arrowHeight = canvas.height * 0.035;
+    const arrowWidth = arrowHeight * 3.2;
+
+    for (let a = arrows.length - 1; a >= 0; a--) {
+        const arrow = arrows[a];
+        arrow.x += arrow.speed;
+
+        const laneCenterY = topLimit + laneHeight * (arrow.lane + 0.5);
+        const arrowY = laneCenterY - arrowHeight / 2;
+
+        if (haruArrowImg.complete && haruArrowImg.naturalWidth > 0) {
+            ctx.drawImage(haruArrowImg, arrow.x, arrowY, arrowWidth, arrowHeight);
+        }
+
+        if (arrow.x > canvas.width + 60) {
+            arrows.splice(a, 1);
+            continue;
+        }
+
+        for (let e = enemies.length - 1; e >= 0; e--) {
+            const enemy = enemies[e];
+            if (enemy.lane === arrow.lane && arrow.x + arrowWidth >= enemy.x && arrow.x <= enemy.x + enemySize) {
+                arrows.splice(a, 1);
+                enemy.hp -= arrow.damage;
+
+                if (enemy.hp <= 0) {
+                    enemies.splice(e, 1);
+                    score += 1;
+                    document.getElementById('score-display').textContent = 'SCORE: ' + score;
+                }
+                break;
             }
         }
     }
