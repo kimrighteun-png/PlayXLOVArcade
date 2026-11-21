@@ -425,3 +425,25 @@ body {
     touch-action: none;
     user-select: none;
 }
+
+
+
+#leaderboard-box {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    color: #ffffff;
+    font-size: 10px;
+    line-height: 1.5;
+    text-shadow: 2px 2px 0 #000000;
+    background: rgba(15, 23, 42, 0.55);
+    padding: 6px 10px;
+    border: 2px solid #ffffff;
+}
+
+#best-score-display {
+    margin-top: 6px;
+    color: #facc15;
+    cursor: pointer;
+}

@@ -32,6 +32,72 @@ const CHARACTERS = [
 
 let currentCharIndex = 0; 
 
+const DB_URL = 'https://play-xlov-arcade-default-rtdb.firebaseio.com/score.json';
+let playerNick = localStorage.getItem('xlov_nick') || '';
+
+function askNicknameIfNeeded() {
+    if (!playerNick) {
+        const entered = prompt('Enter your nickname for TOP 5 leaderboard:', 'Evol');
+        playerNick = (entered && entered.trim()) ? entered.trim().slice(0, 12) : 'Guest';
+        localStorage.setItem('xlov_nick', playerNick);
+    }
+}
+const CHAR_COLORS = {
+    wumuti: 'rgb(255, 2, 2)', 
+    rui: '#f472b6',    
+    hyun: '#38bdf8',   
+    haru: 'rgb(254, 237, 0)'    
+};
+async function syncLeaderboard(newScore = null) {
+    try {
+        const res = await fetch(DB_URL);
+        const data = await res.json();
+        let list = data ? Object.values(data) : [];
+
+        if (newScore !== null && newScore > 0) {
+            askNicknameIfNeeded();
+            const currentCharId = CHARACTERS[currentCharIndex].id.toLowerCase();
+            const existing = list.find(item => item.name.toLowerCase() === playerNick.toLowerCase());
+            if (!existing || newScore > existing.score) {
+                await fetch(DB_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ name: playerNick, score: newScore, char: currentCharId })
+                });
+                const updatedRes = await fetch(DB_URL);
+                const updatedData = await updatedRes.json();
+                list = updatedData ? Object.values(updatedData) : [];
+            }
+        }
+
+        const bestByPlayer = {};
+        list.forEach(item => {
+            if (!item || !item.name) return;
+            const key = item.name.toLowerCase();
+            if (!bestByPlayer[key] || item.score > bestByPlayer[key].score) {
+                bestByPlayer[key] = item;
+            }
+        });
+
+        const top5 = Object.values(bestByPlayer)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5);
+
+        const topEl = document.getElementById('top-list');
+        if (topEl) {
+            topEl.innerHTML = top5.length
+                ? top5.map((p, idx) => {
+                    const color = CHAR_COLORS[p.char] || '#ffffff';
+                    return '<span style="color:' + color + '">' + (idx + 1) + '. ' + p.name + ': ' + p.score + '</span>';
+                }).join('<br>')
+                : 'TOP 5: empty';
+        }
+    } catch (err) {
+        console.log('Leaderboard sync error:', err);
+    }
+}
+
+syncLeaderboard();
+
 // Функция смены экранов
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {
@@ -169,6 +235,7 @@ let gameRunning = false;
 
 let lives = 5;
 let score = 0;
+let bestScore = Number(localStorage.getItem('xlov_best_score')) || 0;
 let enemies = [];
 let swingTimer = 0; // Таймер анимации удара мечом
 
@@ -220,8 +287,8 @@ function triggerAttack() {
     if (selectedChar.id.toLowerCase() === 'hyun') {
         swingTimer = 12; // Запускаем взмах битой на 105 градусов
 
-        const hitStartX = canvas.width * 0.19;
-        const hitEndX = canvas.width * 0.38;
+        const hitStartX = canvas.width * 0.17; // ближняя граница
+        const hitEndX = canvas.width * 0.48; // дальняя граница
 
         for (let i = enemies.length - 1; i >= 0; i--) {
             const enemy = enemies[i];
@@ -370,6 +437,7 @@ function updateHeartsUI() {
 
 // Сброс и старт новой игры
 function startNewGame() {
+    askNicknameIfNeeded();
     if (document.activeElement) document.activeElement.blur();
     resizeCanvas();
     currentLane = 3;
@@ -382,6 +450,7 @@ function startNewGame() {
     spawnTimer = 0;
     updateHeartsUI();
     document.getElementById('score-display').textContent = 'SCORE: 0';
+    document.getElementById('best-score-display').textContent = 'YOUR BEST: ' + bestScore;
     document.getElementById('game-over-modal').style.display = 'none';
     gameRunning = true;
     gameLoop();
@@ -431,9 +500,21 @@ function gameLoop() {
 
             ctx.drawImage(weaponImg, -weaponWidth / 2, -weaponHeight * 0.85, weaponWidth, weaponHeight);
             ctx.restore();
+            // Тонкий прицел-пунктир для Хару, чтобы всегда видеть свою дорожку
+            if (selectedChar.id.toLowerCase() === 'haru') {
+                ctx.save();
+                ctx.setLineDash([8, 8]); // Пунктирная линия
+                ctx.strokeStyle = haruChargeStart > 0 ? 'hsla(0, 0%, 100%, 0.85)' : 'rgba(255, 255, 255, 0.45)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(weaponX + weaponWidth, laneCenterY);
+                ctx.lineTo(canvas.width, laneCenterY);
+                ctx.stroke();
+                ctx.restore();
+            }
                         // Цветная шкала натяжения лука Хару при удержании
             if (selectedChar.id.toLowerCase() === 'haru' && haruChargeStart > 0) {
-                const holdSec = Math.min((performance.now() - haruChargeStart) / 1000, 1.0);
+                const holdSec = Math.min((performance.now() - haruChargeStart) / 750, 1.0);
                 const barW = weaponHeight * 0.8;
                 const barH = 6;
                 const barX = weaponX;
@@ -453,9 +534,15 @@ function gameLoop() {
 
     // 2. Создаём нового врага каждые ~90 кадров (примерно раз в 1.5 секунды)
     spawnTimer++;
-    if (spawnTimer >= 30) {
+    if (spawnTimer >= 60) {
         spawnTimer = 0;
-        const randomLane = Math.floor(Math.random() * LANES);
+        let randomLane = Math.floor(Math.random() * LANES);
+        if (enemies.length > 0) {
+            const lastLane = enemies[enemies.length - 1].lane;
+            const minLane = Math.max(0, lastLane - 4);
+            const maxLane = Math.min(LANES - 1, lastLane + 4);
+            randomLane = Math.floor(Math.random() * (maxLane - minLane + 1)) + minLane;
+        }
         enemies.push({
             lane: randomLane,
             x: canvas.width + 50,
@@ -499,6 +586,12 @@ function gameLoop() {
 
             // Проверяем проигрыш
             if (lives <= 0) {
+                if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('xlov_best_score', bestScore);
+                document.getElementById('best-score-display').textContent = 'YOUR BEST: ' + bestScore;
+            }
+            syncLeaderboard(bestScore);
                 gameRunning = false;
                 document.getElementById('final-score').textContent = 'SCORE: ' + score;
                 document.getElementById('game-over-modal').style.display = 'block';
@@ -584,5 +677,6 @@ document.getElementById('btn-restart').addEventListener('click', startNewGame);
 
 document.getElementById('back').addEventListener('click', () => {
     gameRunning = false;
+    
     document.getElementById('game-over-modal').style.display = 'none';
 });
