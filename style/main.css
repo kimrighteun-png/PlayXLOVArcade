@@ -480,3 +480,16 @@ body {
     color: #facc15;
     cursor: pointer;
 }
+
+
+
+
+
+/* Запрещаем системное меню при долгом нажатии (для стрельбы из лука Хару на телефоне) */
+button, img, canvas, #fire-btn, .control-btn {
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+    touch-action: manipulation !important;
+}
