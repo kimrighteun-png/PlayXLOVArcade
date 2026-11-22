@@ -7,6 +7,15 @@ html, body {
     touch-action: pan-x pan-y; /* Запрещает браузеру зумить страницу при тапах и поворотах */
 }
 
+@font-face {
+    font-family: 'CustomPixel';
+    src: url('../RosesareFF0000.ttf') format('truetype');
+}
+
+* {
+    font-family: 'CustomPixel', monospace !important;
+}
+
 * {
     box-sizing: border-box;
     user-select: none;
@@ -252,18 +261,28 @@ body {
 .char-name{
     position: absolute;
     font-size: 6vh;
-    top: 42%;
+    top: 35%;
     left: 45%;
+       text-shadow: 
+        -0.2vh -0.2vh 0 #000000,
+         0.2vh -0.2vh 0 #000000,
+        -0.2vh  0.2vh 0 #000000,
+         0.2vh  0.2vh 0 #000000,
+         0.35vh 0.35vh 0 #000000;
+
+
 }
 
 .char-desc{
     position: absolute;
-    font-size: 2.8vh;
-    top: 52%;
+    font-size: 3.5vh;
+    top: 45%;
     left: 45%;
     text-align: left;
     line-height: 1,4;
-    width: 30%;
+    width: 27%;
+        text-shadow: 0.25vh 0.25vh 0 #1e1b4b;
+
 }
 
 .btn-start-game{
@@ -274,7 +293,7 @@ body {
 }
 
 .btn-start-game img {
-    width: 10vw;
+    width: 13vw;
     height: auto;
     image-rendering: pixelated;
     display: block;
@@ -310,9 +329,9 @@ body {
 /* 4. Счётчик очков (SCORE: 0) */
 #score-display {
     position: absolute;
-    top: 3%;
-    left: 25%;
-    font-size: 3vh;
+    top: 7%;
+    left: 37%;
+    font-size: 5vh;
     font-weight: bold;
     z-index: 10;
 }
@@ -324,6 +343,11 @@ body {
     right: 7%;
     font-size: 5%;
     z-index: 10;
+}
+
+#hearts-display img {
+    height: 7vh;
+
 }
 
 /* 6. Кнопка ВВЕРХ (up.png) */
@@ -363,14 +387,17 @@ body {
     position: absolute;
     bottom: 8%;
     right: 5%;
-    padding: 2vh 4vw;
-    font-size: 3.5vh;
-    font-weight: bold;
-    background-color: #d81b60;
-    color: #ffffff;
-    border: 3px solid #000000;
     cursor: pointer;
     z-index: 10;
+    background: none;
+    border: none;
+}
+
+#btn-attack img {
+    height: 10vh;
+    width: auto;
+    image-rendering: pixelated;
+    display: block;
 }
 
 /* Лёгкий эффект нажатия для всех игровых кнопок */
@@ -430,16 +457,22 @@ body {
 
 #leaderboard-box {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 2%;
+    left:2%;
     z-index: 20;
     color: #ffffff;
-    font-size: 10px;
+    font-size: 3vh;
     line-height: 1.5;
-    text-shadow: 2px 2px 0 #000000;
-    background: rgba(15, 23, 42, 0.55);
     padding: 6px 10px;
-    border: 2px solid #ffffff;
+    border: none;
+    background: none;
+    text-align: left;
+    text-shadow: 
+        -0.15vh -0.15vh 0 #000000,
+         0.15vh -0.15vh 0 #000000,
+        -0.15vh  0.15vh 0 #000000,
+         0.15vh  0.15vh 0 #000000,
+         0.25vh  0.25vh 0 #000000;
 }
 
 #best-score-display {

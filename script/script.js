@@ -116,6 +116,9 @@ function updateCharacterCard() {
     
     const preview = document.getElementById('char-preview');
     preview.src = char.img;
+       const themeColor = CHAR_COLORS[char.id.toLowerCase()] || '#ffffff';
+    document.getElementById('char-name').style.color = themeColor;
+
 }
 
 // Кнопка START -> открывает экран выбора персонажа
@@ -414,9 +417,9 @@ function releaseHaruArrow() {
     haruChargeStart = 0;
 
     let dmg = 0.5;
-    if (holdSeconds >= 1.0) dmg = 3;
-    else if (holdSeconds >= 0.66) dmg = 2;
-    else if (holdSeconds >= 0.33) dmg = 1;
+    if (holdSeconds >= 0.5) dmg = 3;
+    else if (holdSeconds >= 0.33) dmg = 2;
+    else if (holdSeconds >= 0.16) dmg = 1;
 
     arrows.push({
         lane: currentLane,
@@ -514,7 +517,7 @@ function gameLoop() {
             }
                         // Цветная шкала натяжения лука Хару при удержании
             if (selectedChar.id.toLowerCase() === 'haru' && haruChargeStart > 0) {
-                const holdSec = Math.min((performance.now() - haruChargeStart) / 750, 1.0);
+                const holdSec = Math.min((performance.now() - haruChargeStart) / 500, 1.0);
                 const barW = weaponHeight * 0.8;
                 const barH = 6;
                 const barX = weaponX;
@@ -679,4 +682,20 @@ document.getElementById('back').addEventListener('click', () => {
     gameRunning = false;
     
     document.getElementById('game-over-modal').style.display = 'none';
+});
+
+
+
+
+// Автоматически разворачиваем игру на весь экран при любом нажатии, если она ещё не в фуллскрине
+document.addEventListener('pointerdown', () => {
+    const isFullScreen = document.fullscreenElement || document.webkitFullscreenElement;
+    if (!isFullScreen) {
+        const el = document.documentElement;
+        if (el.requestFullscreen) {
+            el.requestFullscreen().catch(() => {});
+        } else if (el.webkitRequestFullscreen) {
+            el.webkitRequestFullscreen();
+        }
+    }
 });
